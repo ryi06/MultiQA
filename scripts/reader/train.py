@@ -14,6 +14,7 @@ import os
 import sys
 import subprocess
 import logging
+import pickle
 
 
 from drqa.reader import utils, vector, config, data
@@ -145,6 +146,7 @@ def set_defaults(args):
     # Set log + model file names
     args.log_file = os.path.join(args.model_dir, args.model_name + '.txt')
     args.model_file = os.path.join(args.model_dir, args.model_name + '.mdl')
+    args.stats_file = os.path.join(args.model_dir, args.model_name + '.pkl')
 
     # Embeddings options
     if args.embedding_file:
@@ -498,6 +500,8 @@ def main(args):
                          stats['epoch'], model.updates))
             model.save(args.model_file)
             stats['best_valid'] = result[args.valid_metric]
+            pickle.dump(stats, open(args.stats_file, 'wb'))
+
 
 
 if __name__ == '__main__':

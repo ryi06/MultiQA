@@ -126,11 +126,27 @@ def process_dataset(data, tokenizer, workers=None):
 # Commandline options
 # -----------------------------------------------------------------------------
 
+'''
+Example run for generating custom dataset
+python scripts/reader/preprocess.py data/custom_datasets data/custom_datasets --split SQuAD-v1.1-train
+Result saved in data/custom_datasets/SQuAD-v1.1-train-processed-corenlp.txt
+
+Each line in custom_datasets/SQuAD-v1.1-train-processed-corenlp.txt looks like a python dictionary with keys:
+    "id"
+    "question"
+    "document"
+    "offsets"
+    "answers"
+    "qlemma": probably same as question
+    "lemma": probably same as document
+    "pos": part of speech
+    "ner": named entity recognition
+'''
 
 parser = argparse.ArgumentParser()
 parser.add_argument('data_dir', type=str, help='Path to SQuAD data directory')
 parser.add_argument('out_dir', type=str, help='Path to output file dir')
-parser.add_argument('--split', type=str, help='Filename for train/dev split',
+parser.add_argument('--split', type=str, help='Filename for train/dev split to be preprocessed',
                     default='SQuAD-v1.1-train')
 parser.add_argument('--workers', type=int, default=None)
 parser.add_argument('--tokenizer', type=str, default='corenlp')
