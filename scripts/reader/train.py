@@ -498,9 +498,12 @@ def main(args):
             logger.info('Best valid: %s = %.2f (epoch %d, %d updates)' %
                         (args.valid_metric, result[args.valid_metric],
                          stats['epoch'], model.updates))
-            model.save(args.model_file)
+
+            # Save it at each epoch in case job gets killed before it finishes training
+            model.checkpoint(args.model_file, epoch + 1)
             stats['best_valid'] = result[args.valid_metric]
             pickle.dump(stats, open(args.stats_file, 'wb'))
+            logger.info('Progress saved as %s' % args.model_file.replace('.mdl', ''))
 
 
 
@@ -523,6 +526,8 @@ if __name__ == '__main__':
     # Set random state
     np.random.seed(args.random_seed)
     torch.manual_seed(args.random_seed)
+    logger.info('random_seed = %d' % args.random_seed)
+    
     if args.cuda:
         torch.cuda.manual_seed(args.random_seed)
 
