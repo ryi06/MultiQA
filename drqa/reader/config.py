@@ -15,7 +15,8 @@ logger = logging.getLogger(__name__)
 MODEL_ARCHITECTURE = {
     'model_type', 'embedding_dim', 'hidden_size', 'doc_layers',
     'question_layers', 'rnn_type', 'concat_rnn_layers', 'question_merge',
-    'use_qemb', 'use_in_question', 'use_pos', 'use_ner', 'use_lemma', 'use_tf'
+    'use_qemb', 'use_in_question', 'use_pos', 'use_ner', 'use_lemma', 'use_tf', 
+    'use_relation', 'use_parent', 'use_pemb'
 }
 
 # Index of arguments concerning the model optimizer/training
@@ -66,6 +67,13 @@ def add_model_args(parser):
                         help='Whether to use lemma features')
     detail.add_argument('--use-tf', type='bool', default=True,
                         help='Whether to use term frequency features')
+    # added by Ren Yi 04-20-2018
+    detail.add_argument('--use-relation', type='bool', default=False,
+                        help='Whether to use parse relations')
+    detail.add_argument('--use-parent', type='bool', default=False,
+                        help='Whether to use word parent id from parse')
+    detail.add_argument('--use-pemb', type='bool', default=False,
+                        help='Whether to use word parent embedding from parse')
 
     # Optimization details
     optim = parser.add_argument_group('DrQA Reader Optimization')

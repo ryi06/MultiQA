@@ -35,6 +35,10 @@ class RnnDocReader(nn.Module):
 
         # Input size to RNN: word emb + question emb + manual features
         doc_input_size = args.embedding_dim + args.num_features
+        # modified by Ren Yi 04-20-2018
+        if args.use_pemb:
+            doc_input_size += args.embedding_dim
+
         if args.use_qemb:
             doc_input_size += args.embedding_dim
 
@@ -114,9 +118,19 @@ class RnnDocReader(nn.Module):
             x2_weighted_emb = self.qemb_match(x1_emb, x2_emb, x2_mask)
             drnn_input.append(x2_weighted_emb)
 
+        # Modified by Ren Yi 04-20-2018
+        # add parent embedding to x1_emb only, use_parent = x1_f[:,:,-2]
+        if self.args.use_pemb:
+            # get parent index
+            x1_pidx = x1_f[:, :, -2].long()
+            x1_pemb = self.embedding(self.parent(x1, x1_pidx))
+
+            drnn_input.append(x1_pemb)
+
         # Add manual features
         if self.args.num_features > 0:
             drnn_input.append(x1_f)
+
 
         # Encode document with RNN
         doc_hiddens = self.doc_rnn(torch.cat(drnn_input, 2), x1_mask)
@@ -133,3 +147,21 @@ class RnnDocReader(nn.Module):
         start_scores = self.start_attn(doc_hiddens, question_hidden, x1_mask)
         end_scores = self.end_attn(doc_hiddens, question_hidden, x1_mask)
         return start_scores, end_scores
+
+        # Modified by Ren Yi 04-20-2018
+    def parent(self, doc, pidx):
+        batch, length = doc.size()
+        pidx[pidx==-1] = length
+        # initiate <root> index (2)
+        pad = torch.autograd.Variable(torch.zeros((batch, 1)).fill_(2).long())
+        if torch.cuda.is_available():
+            pdoc = torch.autograd.Variable(torch.zeros(batch, length).cuda())
+            doc = torch.cat((doc, pad.cuda()), dim=1)
+        else:
+            pdoc = torch.autograd.Variable(torch.zeros(batch, length))
+            doc = torch.cat((doc, pad), dim=1)
+
+        # Get parent index
+        for b in torch.arange(batch).long():
+            pdoc[b, :] = torch.index_select(doc[b, :], 0, pidx[b, :])
+        return pdoc.long()

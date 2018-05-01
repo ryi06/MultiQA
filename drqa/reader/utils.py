@@ -140,7 +140,6 @@ def build_feature_dict(args, examples):
             feature_dict[feature] = len(feature_dict)
 
     feature_dict = {}
-
     # Exact match features
     if args.use_in_question:
         _insert('in_question')
@@ -160,10 +159,24 @@ def build_feature_dict(args, examples):
             for w in ex['ner']:
                 _insert('ner=%s' % w)
 
+    # added by Ren Yi 04-20-2018
+    # Parsing relation feature
+    if args.use_relation:
+        for ex in examples:
+            for w in ex['relation']:
+                _insert('relation=%s' % w)
+
+    # Parsing parent feature
+    if args.use_parent:
+        _insert('parent')
+
     # Term frequency feature
     if args.use_tf:
         _insert('tf')
     return feature_dict
+
+    
+
 
 
 # ------------------------------------------------------------------------------

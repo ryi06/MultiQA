@@ -23,17 +23,19 @@ logger = logging.getLogger(__name__)
 
 
 class Dictionary(object):
+    # modified by Ren Yi 05-01-2018, add <ROOT> special token for parsing
     NULL = '<NULL>'
     UNK = '<UNK>'
-    START = 2
+    ROOT = '<ROOT>'
+    START = 3
 
     @staticmethod
     def normalize(token):
         return unicodedata.normalize('NFD', token)
 
     def __init__(self):
-        self.tok2ind = {self.NULL: 0, self.UNK: 1}
-        self.ind2tok = {0: self.NULL, 1: self.UNK}
+        self.tok2ind = {self.NULL: 0, self.UNK: 1, self.ROOT: 2}
+        self.ind2tok = {0: self.NULL, 1: self.UNK, 2: self.ROOT}
 
     def __len__(self):
         return len(self.tok2ind)
@@ -76,7 +78,7 @@ class Dictionary(object):
         tokens.
         """
         tokens = [k for k in self.tok2ind.keys()
-                  if k not in {'<NULL>', '<UNK>'}]
+                  if k not in {'<NULL>', '<UNK>', '<ROOT>'}]
         return tokens
 
 
