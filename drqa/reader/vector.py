@@ -53,6 +53,19 @@ def vectorize(ex, model, single_answer=False):
             if f in feature_dict:
                 features[i][feature_dict[f]] = 1.0
 
+    # added by Ren Yi 04-30-2018
+    # f_{parse} (r)
+    if args.use_relation:
+        for i, w in enumerate(ex['relation']):
+            f = 'relation=%s' % w
+            if f in feature_dict:
+                features[i][feature_dict[f]] = 1.0
+
+    # f_{parse} (p)
+    if args.use_parent:
+        for i, w in enumerate(ex['parent']):
+            features[i][feature_dict['parent']] = ex['parent'][i] - 1
+
     # f_{token} (TF)
     if args.use_tf:
         counter = Counter([w.lower() for w in ex['document']])

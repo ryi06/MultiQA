@@ -44,6 +44,7 @@ class DocReader(object):
         # Building network. If normalize if false, scores are not normalized
         # 0-1 per paragraph (no softmax).
         if args.model_type == 'rnn':
+
             self.network = RnnDocReader(args, normalize)
         else:
             raise RuntimeError('Unsupported model: %s' % args.model_type)
